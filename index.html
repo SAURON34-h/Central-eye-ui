@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Central Eye Chat</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #121212;
+      color: #e0e0e0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    header {
+      background-color: #1f1f1f;
+      padding: 1rem;
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #00e5ff;
+    }
+
+    main {
+      flex: 1;
+      padding: 1rem;
+      overflow-y: auto;
+    }
+
+    .message {
+      margin: 0.5rem 0;
+    }
+
+    .user {
+      color: #00e5ff;
+      font-weight: bold;
+    }
+
+    .bot {
+      color: #b9f6ca;
+    }
+
+    form {
+      display: flex;
+      padding: 1rem;
+      background: #1f1f1f;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 0.75rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 4px;
+      margin-right: 0.5rem;
+    }
+
+    button {
+      background-color: #00e5ff;
+      color: #000;
+      padding: 0.75rem 1rem;
+      border: none;
+      border-radius: 4px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #00bcd4;
+    }
+  </style>
+</head>
+<body>
+  <header>🤖 Central Eye Assistant</header>
+  <main id="chatLog"></main>
+  <form id="chatForm">
+    <input type="text" id="userInput" placeholder="Ask me anything..." autocomplete="off" required />
+    <button type="submit">Send</button>
+  </form>
+
+  <script>
+    const form = document.getElementById('chatForm');
+    const input = document.getElementById('userInput');
+    const chatLog = document.getElementById('chatLog');
+
+    const backendUrl = 'https://central-eye-1.onrender.com/chat'; // Replace with your backend if different
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const message = input.value.trim();
+      if (!message) return;
+
+      appendMessage('You', message, 'user');
+      input.value = '';
+      
+      try {
+        const res = await fetch(backendUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ message })
+        });
+        const data = await res.json();
+        appendMessage('Central Eye', data.response || 'Error', 'bot');
+      } catch (err) {
+        appendMessage('Error', 'Failed to reach backend.', 'bot');
+      }
+    });
+
+    function appendMessage(sender, text, className) {
+      const msg = document.createElement('div');
+      msg.classList.add('message', className);
+      msg.innerHTML = `<strong>${sender}:</strong> ${text}`;
+      chatLog.appendChild(msg);
+      chatLog.scrollTop = chatLog.scrollHeight;
+    }
+  </script>
+</body>
+</html>
+Add index.html chat UI
